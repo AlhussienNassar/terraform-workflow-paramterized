@@ -1,0 +1,35 @@
+name: Terraform-GitHub-Actions
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to Development or Production'
+        required: true
+        default: '' # Default value, change as needed
+  
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+jobs:
+  buildt:
+    name: build
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    env:
+      TF_VAR_aws_region: ${{ vars.AWS_REGION }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+       
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+      
+      - name: Terraform Init
+        run: terraform init
+      
+      - name: Terraform Plan
+        run: terraform plan
+      
+      - name: Terraform Apply
+        run: terraform apply --auto-approve
+      
